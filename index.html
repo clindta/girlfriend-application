@@ -645,14 +645,15 @@
   <div class="wlq-footer-links" id="wlqFooterLinks"></div>
 </footer>
 
+<script src="config.js"></script>
+<script src="quiz-defaults.js"></script>
 <script>
-  // ====================================================================
-  // KONFIGURATION — Hier deine Supabase-Daten eintragen (siehe README.md)
-  // ====================================================================
-  const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
-  const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
-  const CONTACT_EMAIL = 'clindta@gmail.com';
-  const OWNER_FIRST_NAME = 'Chris';
+  // Config + Defaults werden aus externen Dateien geladen (config.js, quiz-defaults.js)
+  const _cfg = window.GF_CONFIG || {};
+  const SUPABASE_URL = _cfg.SUPABASE_URL || 'YOUR_SUPABASE_URL_HERE';
+  const SUPABASE_ANON_KEY = _cfg.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY_HERE';
+  const CONTACT_EMAIL = _cfg.CONTACT_EMAIL || 'clindta@gmail.com';
+  const OWNER_FIRST_NAME = _cfg.OWNER_FIRST_NAME || 'Chris';
 
   // ==================== i18n ====================
   function detectInitialLang(){
@@ -759,7 +760,7 @@
   };
 
   // ==================== State ====================
-  let STEPS = ['typ','adjektive','sonntag','schnellrunde','greenflags','interesse','love_lang','happy','date','comms','universe','rueckfrage','message','kontakt'];
+  let STEPS = (window.GF_DEFAULTS && window.GF_DEFAULTS.STEPS) || ['typ','adjektive','sonntag','schnellrunde','greenflags','interesse','love_lang','happy','date','comms','universe','rueckfrage','message','kontakt'];
 
   let screen = 'landing';
   let step = 0;
@@ -968,6 +969,12 @@
       subtitle: { de:'Letzter Schritt. Versprochen.',                    en:'Last step. Promise.' }
     }
   };
+
+  // Wenn quiz-defaults.js geladen wurde, nutze diese als Quelle (Inline-Daten sind Fallback)
+  if (window.GF_DEFAULTS) {
+    if (window.GF_DEFAULTS.ADJEKTIVE) ADJEKTIVE = window.GF_DEFAULTS.ADJEKTIVE;
+    if (window.GF_DEFAULTS.STEP_DATA) STEP_DATA = window.GF_DEFAULTS.STEP_DATA;
+  }
 
   const I = {
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',

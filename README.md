@@ -1,6 +1,6 @@
 # Girlfriend Application — Chris
 
-Ein interaktives Bewerbungsformular als Single-Page-HTML. Läuft direkt im Browser, speichert Antworten in Supabase (DB + Storage für Voice/Video) und kann kostenlos via GitHub Pages gehostet werden.
+Ein interaktives Bewerbungsformular mit Admin-Dashboard. Single-Page-HTML, läuft direkt im Browser, speichert Antworten in Supabase (DB + Storage für Voice/Video). Kostenlos gehostet via GitHub Pages.
 
 ---
 
@@ -8,125 +8,145 @@ Ein interaktives Bewerbungsformular als Single-Page-HTML. Läuft direkt im Brows
 
 ```
 girlfriend-application/
-├── index.html      ← die App (Single-File, kein Build nötig)
-├── supabase.sql    ← einmal in Supabase ausführen
-└── README.md       ← diese Anleitung
+├── index.html              ← Das Formular (für Bewerberinnen)
+├── admin/index.html        ← Admin-Dashboard (für dich)
+├── config.js               ← Geteilte Supabase-Config (URL + Key)
+├── quiz-defaults.js        ← Quiz-Definition (Schritte, Fragen, Adjektive)
+├── supabase.sql            ← Einmal in Supabase ausführen
+└── README.md               ← Diese Anleitung
 ```
 
----
-
-## Quickstart
-
-1. **Supabase-Projekt anlegen** (siehe unten)
-2. **`SUPABASE_URL` und `SUPABASE_ANON_KEY`** in `index.html` eintragen (Zeile ~770)
-3. **GitHub Pages aktivieren** (siehe unten)
-4. **Fertig** — Link teilen
-
-Ohne Supabase-Setup läuft die App im **Demo-Modus** — Antworten werden nicht gespeichert, sondern nur in die Browser-Console geloggt.
+**Live-URLs (nach GitHub-Pages-Deployment):**
+- Formular: `https://DEIN_USERNAME.github.io/girlfriend-application/`
+- Admin: `https://DEIN_USERNAME.github.io/girlfriend-application/admin/`
 
 ---
 
-## 1) Supabase-Setup
+## Quickstart (kompletter Setup)
 
-### a) Projekt erstellen
-1. [supabase.com](https://supabase.com) → "New Project"
-2. Region: Frankfurt (EU) für DSGVO
-3. DB-Passwort merken (brauchst du nur intern)
+### 1. Supabase-Projekt anlegen
 
-### b) Tabelle + Storage anlegen
-- Im Supabase-Dashboard: **SQL Editor → New query**
-- Inhalt von `supabase.sql` einfügen → **Run**
+1. [supabase.com](https://supabase.com/dashboard) → **New project**
+2. Name: `girlfriend-application`, Region: **Frankfurt (EU Central)**
+3. DB-Passwort: komplex (musst du dir nicht merken — nur intern)
+4. Warten bis Status grün ist (~2 Min)
+
+### 2. Schema einspielen
+
+- Supabase-Dashboard → **SQL Editor → New query**
+- Inhalt von [supabase.sql](supabase.sql) reinkopieren → **Run**
+- Erfolgsmeldung sollte erscheinen — fertig
 
 Das legt an:
-- Tabelle `gf_applications` mit allen Feldern
-- Storage Bucket `gf-voice-messages` (öffentlich lesbar für die URL im Mail-Link)
-- RLS-Policies, die nur INSERT von außen erlauben (niemand kann Bewerbungen auslesen außer dir im Dashboard)
+- Tabelle `gf_applications` (Bewerbungen)
+- Tabelle `gf_quiz_steps` (editierbares Quiz)
+- RPC `get_gf_quiz_steps` (das Formular lädt das Quiz darüber)
+- Storage Bucket `gf-voice-messages` (Audio/Video)
+- RLS-Policies:
+  - Bewerbungen: jeder darf INSERT, nur eingeloggte Admins dürfen SELECT/DELETE
+  - Quiz: jeder darf lesen, nur eingeloggte Admins dürfen bearbeiten
 
-### c) Keys holen
+### 3. Admin-User anlegen
+
+Damit du dich im Dashboard einloggen kannst:
+
+1. Supabase Dashboard → **Authentication → Users**
+2. **Add user → Create new user**
+3. Email + Passwort vergeben
+4. **"Auto Confirm User" aktivieren** (sonst musst du eine Bestätigungs-Mail bestätigen, die nirgendwohin geht)
+5. Optional: **Authentication → Providers → Email** → **"Allow new users to sign up" AUS**, damit niemand sonst Accounts anlegen kann
+
+### 4. Keys in config.js eintragen
+
 - Supabase Dashboard → **Settings → API**
-- Kopieren:
-  - `Project URL` → `SUPABASE_URL`
-  - `anon public` Key → `SUPABASE_ANON_KEY`
+- Kopier:
+  - `Project URL` → in `config.js` als `SUPABASE_URL`
+  - `anon public` Key → in `config.js` als `SUPABASE_ANON_KEY`
 
-### d) In `index.html` eintragen
-Suche nach diesem Block (ganz oben im `<script>`):
+`config.js` sieht dann so aus:
 
 ```js
-const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+window.GF_CONFIG = {
+  SUPABASE_URL: 'https://xxxxx.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGc...',
+  CONTACT_EMAIL: 'clindta@gmail.com',
+  OWNER_FIRST_NAME: 'Chris'
+};
 ```
 
-Werte einsetzen, speichern.
+### 5. Pushen
 
-### e) Testen
-- Öffne `index.html` lokal im Browser (Doppelklick)
-- Formular ausfüllen → Submit
-- Im Supabase-Dashboard: **Table Editor → gf_applications** → neuer Eintrag da? ✓
-
----
-
-## 2) Benachrichtigung per Email (optional)
-
-Damit du nicht ständig in der DB nachschauen musst:
-
-### Option A: Supabase Database Webhook + Resend (empfohlen)
-1. Resend-Account anlegen (3.000 Mails/Monat gratis)
-2. Supabase → **Database → Webhooks → Create Webhook**
-3. Table: `gf_applications`, Event: `INSERT`
-4. URL: Edge Function oder Resend-API direkt
-
-### Option B: Email-Polling per Cron
-Einfacher: schreib dir einen kleinen Script-Job, der jede Stunde die Tabelle abfragt und neue Einträge per Email schickt.
-
-### Option C (für später): Pushover / Telegram Bot
-Live-Notification auf's Handy.
-
----
-
-## 3) GitHub Pages Deployment
-
-### a) Git-Repo anlegen
 ```bash
 cd ~/Desktop/girlfriend-application
-git init
-git add index.html README.md supabase.sql
-git commit -m "initial: girlfriend application form"
+git add config.js
+git commit -m "connect supabase"
+git push
 ```
 
-### b) Auf GitHub pushen
-1. [github.com/new](https://github.com/new) → Repo `girlfriend-application` (Public oder Private — beides geht für Pages bei kostenlosem Account ist Public Pflicht)
-2. Lokal:
-```bash
-git remote add origin git@github.com:DEIN_USERNAME/girlfriend-application.git
-git branch -M main
-git push -u origin main
-```
+### 6. Quiz initialisieren
 
-### c) Pages aktivieren
-1. Repo auf GitHub → **Settings → Pages**
-2. **Source**: `Deploy from a branch`
-3. **Branch**: `main`, Folder: `/ (root)`
-4. **Save**
-5. Nach ~1 Minute: Link verfügbar unter
-   `https://DEIN_USERNAME.github.io/girlfriend-application/`
+- Geh auf das Admin-Dashboard (`/admin/`)
+- Mit deinem Admin-Account einloggen
+- Tab **"Quiz"** → Button **"Defaults synchronisieren"** klicken
+- Damit werden alle 14 Schritte aus `quiz-defaults.js` in die DB geschrieben
 
-### d) Eigene Domain (optional)
-- DNS: CNAME auf `DEIN_USERNAME.github.io`
-- GitHub Pages → Custom Domain eintragen
-- HTTPS-Toggle aktivieren
+Ab jetzt kannst du jeden Schritt im Dashboard editieren.
 
 ---
 
-## 4) Updates pushen
+## Admin-Dashboard Features
+
+### Bewerbungen
+- Liste aller eingegangenen Bewerbungen
+- Suche nach Name, Kontakt oder Typ
+- Klick auf Eintrag → alle Antworten + Voice/Video-Player inline
+- **Live-Updates**: neue Bewerbungen erscheinen sofort (Realtime-Channel)
+- Bewerbung löschen (mit Bestätigung)
+- Stats: Total, Heute, mit Voice/Video, mit Text-Nachricht
+
+### Quiz-Editor
+- Sidebar mit allen Schritten + Vorschau der Frage
+- Klick auf Schritt → Editor öffnet sich rechts
+- Pro Schritt editierbar:
+  - Frage + Untertitel (DE + EN)
+  - Antwortmöglichkeiten (für Single-Choice): Label, Sub, Value, Freitext-Erlaubt
+  - Chips (für Adjektive): einfache DE/EN-Liste
+  - Felder (für Schnellrunde): Key + Label + Placeholder
+  - Placeholder + Mindestlänge (für Freitext-Schritte)
+  - Überspringbar-Flag
+- Antworten/Chips neu sortieren (↑↓), löschen (✕), hinzufügen
+- Speichern pro Schritt
+- "Defaults synchronisieren" — alles auf Code-Defaults zurücksetzen
+
+---
+
+## Lokal entwickeln/testen
+
+Doppelklick auf `index.html` öffnet das Formular im Browser. Solange Supabase noch nicht konfiguriert ist, läuft alles im **Demo-Modus** — Submits werden in der Browser-Console geloggt (F12), nicht gespeichert.
+
+Wichtig: `file://`-URLs erlauben kein Storage-Upload. Für realistisches lokales Testen einen Mini-Server starten:
 
 ```bash
+cd ~/Desktop/girlfriend-application
+python3 -m http.server 8000
+# → http://localhost:8000
+# → http://localhost:8000/admin/
+```
+
+---
+
+## GitHub Pages Updates
+
+```bash
+cd ~/Desktop/girlfriend-application
+
 # Was geändert?
 git status
 git diff
 
 # Committen + pushen
-git add index.html
-git commit -m "update: copy in step X"
+git add -A
+git commit -m "describe change"
 git push
 ```
 
@@ -134,23 +154,20 @@ Nach ~1 Min ist die neue Version live.
 
 ---
 
-## Sicherheitsnotizen
+## Sicherheit
 
-- **Der `anon`-Key ist öffentlich.** Das ist OK — RLS in `supabase.sql` erlaubt nur INSERTs, kein SELECT von außen.
-- **Niemals den `service_role` Key in die HTML packen.** Der gibt Vollzugriff.
-- **Voice/Video-URLs sind öffentlich**, sobald jemand die URL kennt. Sie sind aber zufällig generiert und nirgendwo verlinkt außer in deiner DB-Zeile.
-- **DSGVO**: Du sammelst personenbezogene Daten. Bei öffentlichem Hosting wäre eigentlich Impressum + Datenschutzerklärung Pflicht. Für eine private Bewerbungsseite ist das eine Grauzone — keine Rechtsberatung, aber hol dir im Zweifel eine.
-
----
-
-## Lokal testen ohne Supabase
-
-Einfach `index.html` doppelklicken — läuft. Submits werden in die Browser-Console geloggt (F12 → Console). Du siehst das ganze Payload-Objekt und kannst das Formular bequem durchklicken.
+- **Der `anon`-Key ist öffentlich** — das ist okay, RLS schützt die Daten.
+- **Niemals `service_role` Key in den Code** — der gibt Vollzugriff.
+- **Bewerbungen sind nur für eingeloggte User lesbar** (RLS). Wenn du in der Supabase Auth den Self-Signup deaktivierst, kann sich niemand außer dir einloggen.
+- **Voice/Video-URLs sind öffentlich**, wenn man sie kennt. Sie sind zufällig generiert und nirgendwo verlinkt außer in deiner DB-Zeile.
+- **Admin-URL ist öffentlich erreichbar**, aber ohne Login zeigt sie nur den Login-Screen — kein Zugriff auf Daten.
+- **DSGVO**: Bei öffentlichem Hosting wäre Impressum + Datenschutzerklärung theoretisch Pflicht. Für eine private Bewerbungsseite ist das eine Grauzone — im Zweifel rechtlich abklären.
 
 ---
 
 ## Bekannte Limits
 
-- **Voice-Recording in Safari iOS**: funktioniert ab Safari 14.5+, ältere iPhones können nur Text.
-- **Datei-Größe**: Storage-Bucket hat default 50 MB pro File — sollte für 1–2 Min Voice/Video easy reichen.
-- **Free Tier Supabase**: 500 MB DB + 1 GB Storage = ca. 200–500 Bewerbungen mit Video. Mehr als genug.
+- **Voice-Recording iOS**: ab Safari 14.5+. Ältere iPhones nutzen Text-Fallback.
+- **File-Größe**: Storage default 50 MB pro File — reicht für 1–2 Min Voice/Video easy.
+- **Supabase Free Tier**: 500 MB DB + 1 GB Storage = ca. 200–500 Bewerbungen mit Video. Mehr als genug.
+- **Realtime**: muss in Supabase-Dashboard unter **Database → Replication** für die Tabelle `gf_applications` aktiviert sein, sonst kommen keine Live-Updates im Admin.

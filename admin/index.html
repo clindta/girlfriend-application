@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="de"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>GF Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --milk: #f8f1ec;
+    --white: #ffffff;
+    --black: #1a1411;
+    --text-soft: rgba(26,20,17,0.55);
+    --text-muted: rgba(26,20,17,0.35);
+    --brand: #2a1d18;
+    --brand-dark: #1a1411;
+    --accent: #c1543c;
+    --accent-soft: rgba(193,84,60,0.10);
+    --line: #ece1d8;
+    --line-strong: #d8c8b8;
+    --danger: #c0392b;
+    --success: #27ae60;
+  }
+  html, body {
+    background: var(--milk);
+    color: var(--black);
+    font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  body { padding: 0; }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea, select { font-family: inherit; }
+
+  /* ============ LOGIN ============ */
+  .login-wrap {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 380px;
+    background: var(--white);
+    border-radius: 1.25rem;
+    padding: 2.25rem 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+  }
+  .login-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.5px;
+  }
+  .login-sub {
+    font-size: 0.88rem;
+    color: var(--text-soft);
+    margin-bottom: 1.5rem;
+  }
+  .login-field { margin-bottom: 0.9rem; }
+  .login-field label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+  }
+  .login-field input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 1.5px solid var(--line);
+    border-radius: 0.55rem;
+    font-size: 0.95rem;
+    background: var(--white);
+    outline: none;
+  }
+  .login-field input:focus { border-color: var(--accent); }
+  .login-btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.7rem;
+    background: var(--brand);
+    color: var(--white);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    transition: all 0.2s;
+  }
+  .login-btn:hover { background: var(--brand-dark); }
+  .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-err {
+    margin-top: 1rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 0.5rem;
+    background: rgba(192,57,43,0.08);
+    color: var(--danger);
+    font-size: 0.82rem;
+    border: 1px solid rgba(192,57,43,0.2);
+  }
+  .login-config-warning {
+    margin-top: 1rem;
+    padding: 0.85rem;
+    border-radius: 0.5rem;
+    background: rgba(193,84,60,0.06);
+    color: var(--accent);
+    font-size: 0.78rem;
+    border: 1px solid rgba(193,84,60,0.2);
+    line-height: 1.5;
+  }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem 1.5rem 4rem;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  .top-brand {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+  .top-brand small {
+    font-weight: 500;
+    color: var(--text-soft);
+    margin-left: 0.4rem;
+    font-size: 0.78rem;
+  }
+  .top-right { display: flex; align-items: center; gap: 0.6rem; }
+  .top-user {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    margin-right: 0.4rem;
+  }
+  .top-btn {
+    padding: 0.5rem 0.9rem;
+    border: 1px solid var(--line);
+    border-radius: 0.5rem;
+    background: var(--white);
+    color: var(--brand);
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .top-btn:hover { background: var(--milk); border-color: var(--line-strong); }
+  .top-btn.danger { color: var(--danger); }
+  .tabs {
+    display: inline-flex;
+    background: var(--white);
+    border-radius: 0.65rem;
+    padding: 0.25rem;
+    border: 1px solid var(--line);
+    margin-bottom: 1.5rem;
+  }
+  .tab {
+    padding: 0.55rem 1.1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-soft);
+    font-size: 0.88rem;
+    font-weight: 500;
+    border-radius: 0.45rem;
+    transition: all 0.2s;
+  }
+  .tab.active { background: var(--brand); color: var(--white); }
+  .tab .badge {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0.05rem 0.4rem;
+    border-radius: 0.4rem;
+    background: rgba(255,255,255,0.2);
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .tab:not(.active) .badge { background: var(--milk); color: var(--text-soft); }
+
+  /* ============ SHARED ============ */
+  .card {
+    background: var(--white);
+    border-radius: 0.85rem;
+    border: 1px solid var(--line);
+    padding: 1.25rem;
+  }
+  .toolbar {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  .search {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.7rem 0.95rem;
+    border: 1.5px solid var(--line);
+    border-radius: 0.6rem;
+    background: var(--white);
+    font-size: 0.9rem;
+    outline: none;
+  }
+  .search:focus { border-color: var(--accent); }
+  .btn {
+    padding: 0.7rem 1.1rem;
+    border: none;
+    border-radius: 0.6rem;
+    background: var(--brand);
+    color: var(--white);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--brand-dark); }
+  .btn.secondary {
+    background: var(--white);
+    color: var(--brand);
+    border: 1px solid var(--line);
+  }
+  .btn.secondary:hover { background: var(--milk); }
+  .btn.danger { background: var(--danger); }
+  .btn.danger:hover { background: #962d22; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+  }
+  .empty .icon { font-size: 2rem; margin-bottom: 0.8rem; opacity: 0.5; }
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-soft);
+    font-size: 0.9rem;
+  }
+
+  /* ============ SUBMISSIONS ============ */
+  .sub-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .sub-row {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .sub-row:hover { border-color: var(--line-strong); }
+  .sub-row.open { border-color: var(--accent); }
+  .sub-head {
+    display: grid;
+    grid-template-columns: 110px 1fr 1fr 100px 80px 32px;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.95rem 1.1rem;
+    cursor: pointer;
+  }
+  @media (max-width: 700px) {
+    .sub-head { grid-template-columns: 1fr 1fr 32px; }
+    .sub-col.col-typ, .sub-col.col-msg { display: none; }
+  }
+  .sub-col { font-size: 0.88rem; }
+  .sub-col.col-date { color: var(--text-soft); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+  .sub-col.col-name { font-weight: 600; }
+  .sub-col.col-kontakt { color: var(--text-soft); font-size: 0.82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sub-col.col-typ {
+    font-size: 0.72rem;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 0.2rem 0.55rem;
+    border-radius: 0.35rem;
+    display: inline-block;
+    width: fit-content;
+    font-weight: 600;
+  }
+  .sub-col.col-msg { font-size: 1rem; }
+  .sub-col.col-toggle { color: var(--text-muted); text-align: center; transition: transform 0.2s; }
+  .sub-row.open .sub-col.col-toggle { transform: rotate(180deg); }
+  .sub-detail {
+    padding: 1.5rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--line);
+    background: var(--milk);
+  }
+  .sub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  .sub-field { }
+  .sub-field-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    letter-spacing: 0.4px;
+    margin-bottom: 0.3rem;
+  }
+  .sub-field-value {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+  .sub-field-value.muted { color: var(--text-muted); font-style: italic; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .tag {
+    padding: 0.25rem 0.65rem;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.78rem;
+  }
+  .sub-message-block {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 0.65rem;
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  .sub-message-block audio, .sub-message-block video {
+    width: 100%;
+    border-radius: 0.4rem;
+  }
+  .sub-message-block video { max-height: 320px; background: #000; }
+  .sub-message-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+  .sub-message-meta a { color: var(--brand); text-decoration: none; }
+  .sub-message-meta a:hover { text-decoration: underline; }
+  .sub-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+  /* ============ QUIZ EDITOR ============ */
+  .quiz-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 800px) {
+    .quiz-layout { grid-template-columns: 1fr; }
+  }
+  .quiz-sidebar {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 0.85rem;
+    padding: 0.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  @media (max-width: 800px) {
+    .quiz-sidebar { position: static; max-height: none; }
+  }
+  .quiz-side-item {
+    width: 100%;
+    text-align: left;
+    padding: 0.7rem 0.85rem;
+    border: none;
+    background: transparent;
+    border-radius: 0.5rem;
+    margin-bottom: 0.15rem;
+    transition: background 0.15s;
+  }
+  .quiz-side-item:hover { background: var(--milk); }
+  .quiz-side-item.active { background: var(--accent-soft); }
+  .quiz-side-item.active .qsi-label { color: var(--accent); }
+  .qsi-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 0.2rem;
+  }
+  .qsi-q {
+    font-size: 0.85rem;
+    color: var(--black);
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .qsi-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem;
+    background: var(--line);
+    color: var(--text-soft);
+    margin-left: 0.4rem;
+    font-weight: 500;
+  }
+  .quiz-editor {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 0.85rem;
+    padding: 1.5rem;
+  }
+  .quiz-editor h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    letter-spacing: -0.3px;
+  }
+  .quiz-editor-meta {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    margin-bottom: 1.25rem;
+  }
+  .qe-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .qe-section:last-child { border-bottom: none; padding-bottom: 0; }
+  .qe-section h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.85rem;
+    letter-spacing: -0.1px;
+  }
+  .qe-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.6rem; }
+  @media (max-width: 600px) { .qe-row { grid-template-columns: 1fr; } }
+  .qe-field { display: flex; flex-direction: column; }
+  .qe-field > label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 0.3rem;
+  }
+  .qe-field input, .qe-field textarea {
+    padding: 0.7rem 0.85rem;
+    border: 1.5px solid var(--line);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .qe-field input:focus, .qe-field textarea:focus { border-color: var(--accent); }
+  .qe-field textarea { min-height: 65px; resize: vertical; }
+  .qe-option {
+    border: 1px solid var(--line);
+    border-radius: 0.6rem;
+    padding: 0.85rem;
+    margin-bottom: 0.6rem;
+    background: var(--milk);
+  }
+  .qe-option-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+  }
+  .qe-option-num {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-soft);
+  }
+  .qe-option-controls {
+    display: flex;
+    gap: 0.3rem;
+  }
+  .qe-icon-btn {
+    width: 28px; height: 28px;
+    border: 1px solid var(--line);
+    background: var(--white);
+    color: var(--text-soft);
+    border-radius: 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .qe-icon-btn:hover { background: var(--milk); color: var(--brand); }
+  .qe-icon-btn.del:hover { color: var(--danger); border-color: rgba(192,57,43,0.3); }
+  .qe-icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .qe-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+    cursor: pointer;
+    margin-top: 0.3rem;
+  }
+  .qe-checkbox input { width: auto; cursor: pointer; }
+  .qe-bar {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .qe-bar-spacer { flex: 1; }
+  .qe-status {
+    font-size: 0.8rem;
+    color: var(--success);
+    transition: opacity 0.3s;
+  }
+  .qe-status.dirty { color: var(--accent); }
+  .qe-status.hidden { opacity: 0; }
+  .qe-add {
+    padding: 0.6rem 0.85rem;
+    border: 1.5px dashed var(--line-strong);
+    border-radius: 0.5rem;
+    background: transparent;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    font-weight: 500;
+    width: 100%;
+    transition: all 0.2s;
+  }
+  .qe-add:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  .stats-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .stat {
+    flex: 1;
+    min-width: 110px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+    padding: 0.85rem 1rem;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-soft);
+    margin-bottom: 0.2rem;
+    font-weight: 600;
+  }
+  .stat-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--brand);
+    color: var(--white);
+    padding: 0.85rem 1.4rem;
+    border-radius: 0.6rem;
+    font-size: 0.88rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+  .toast.error { background: var(--danger); }
+  .toast.success { background: var(--success); }
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div class="loading">Lade…</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../config.js"></script>
+<script src="../quiz-defaults.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  'use strict';
+
+  // ====================================================================
+  // INIT
+  // ====================================================================
+  const cfg = window.GF_CONFIG || {};
+  const defaults = window.GF_DEFAULTS || { STEPS:[], STEP_DATA:{}, ADJEKTIVE:[] };
+  const root = document.getElementById('root');
+
+  const configured = cfg.SUPABASE_URL && cfg.SUPABASE_URL.startsWith('http')
+    && cfg.SUPABASE_ANON_KEY && cfg.SUPABASE_ANON_KEY.length > 30;
+
+  let supa = null;
+  if (configured) {
+    supa = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true }
+    });
+  }
+
+  // App state
+  const state = {
+    session: null,
+    tab: 'submissions',
+    subs: [],
+    subSearch: '',
+    openSubId: null,
+    quizSteps: [],
+    selectedStepKey: null,
+    editBuffer: null,
+    dirty: false,
+    loading: false,
+  };
+
+  // ====================================================================
+  // HELPERS
+  // ====================================================================
+  const $ = id => document.getElementById(id);
+  function esc(s){
+    if (s == null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function fmtDate(iso){
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = n => String(n).padStart(2,'0');
+    return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function fmtDateShort(iso){
+    if (!iso) return '';
+    const d = new Date(iso);
+    return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.`;
+  }
+  function fmtDuration(sec){
+    if (sec == null) return '';
+    const m = Math.floor(sec/60), s = sec % 60;
+    return `${m}:${String(s).padStart(2,'0')}`;
+  }
+  function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  let toastTimer = null;
+  function toast(msg, kind){
+    const t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (kind || '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ====================================================================
+  // AUTH
+  // ====================================================================
+  async function initAuth(){
+    if (!supa) { renderLogin(); return; }
+    const { data } = await supa.auth.getSession();
+    state.session = data.session;
+    if (state.session) {
+      await onAuthenticated();
+    } else {
+      renderLogin();
+    }
+    supa.auth.onAuthStateChange((_event, session) => {
+      state.session = session;
+      if (session) onAuthenticated();
+      else renderLogin();
+    });
+  }
+
+  async function onAuthenticated(){
+    await Promise.all([fetchSubmissions(), fetchQuizSteps()]);
+    renderApp();
+    // Real-time: new applications come in live
+    supa.channel('public:gf_applications')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'gf_applications' }, async () => {
+        await fetchSubmissions();
+        if (state.tab === 'submissions') renderApp();
+        toast('Neue Bewerbung eingegangen', 'success');
+      }).subscribe();
+  }
+
+  async function signIn(email, password){
+    const { data, error } = await supa.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
+  }
+
+  async function signOut(){
+    await supa.auth.signOut();
+  }
+
+  // ====================================================================
+  // DATA FETCHING
+  // ====================================================================
+  async function fetchSubmissions(){
+    const { data, error } = await supa
+      .from('gf_applications')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) { console.error(error); toast('Fehler beim Laden: ' + error.message, 'error'); return; }
+    state.subs = data || [];
+  }
+
+  async function fetchQuizSteps(){
+    const { data, error } = await supa
+      .from('gf_quiz_steps')
+      .select('*')
+      .order('sort_order', { ascending: true });
+    if (error) { console.error(error); toast('Fehler beim Laden: ' + error.message, 'error'); return; }
+    state.quizSteps = data || [];
+    if (!state.selectedStepKey && state.quizSteps.length) {
+      state.selectedStepKey = state.quizSteps[0].step_key;
+      state.editBuffer = deepClone(state.quizSteps[0]);
+    }
+  }
+
+  async function deleteSubmission(id){
+    if (!confirm('Diese Bewerbung wirklich löschen? Das lässt sich nicht rückgängig machen.')) return;
+    const { error } = await supa.from('gf_applications').delete().eq('id', id);
+    if (error) { toast('Konnte nicht löschen: ' + error.message, 'error'); return; }
+    state.subs = state.subs.filter(s => s.id !== id);
+    state.openSubId = null;
+    toast('Gelöscht', 'success');
+    renderApp();
+  }
+
+  async function syncQuizDefaults(){
+    if (!confirm('Das überschreibt alle Quiz-Schritte mit den Standardwerten aus dem Code. Sicher?')) return;
+    const rows = defaults.STEPS.map((key, idx) => {
+      const sd = defaults.STEP_DATA[key] || {};
+      return {
+        step_key: key,
+        step_type: sd.type,
+        sort_order: idx,
+        question: sd.question || null,
+        subtitle: sd.subtitle || null,
+        options: sd.options || null,
+        fields: sd.fields || null,
+        placeholder: sd.placeholder || null,
+        min_length: sd.minLength || null,
+        skipable: !!sd.skipable
+      };
+    });
+    const { error } = await supa.from('gf_quiz_steps').upsert(rows, { onConflict: 'step_key' });
+    if (error) { toast('Sync fehlgeschlagen: ' + error.message, 'error'); return; }
+    await fetchQuizSteps();
+    toast('Quiz synchronisiert (' + rows.length + ' Schritte)', 'success');
+    renderApp();
+  }
+
+  async function saveQuizStep(){
+    if (!state.editBuffer) return;
+    const b = state.editBuffer;
+    const row = {
+      step_key: b.step_key,
+      step_type: b.step_type,
+      sort_order: b.sort_order,
+      question: b.question || null,
+      subtitle: b.subtitle || null,
+      options: b.options || null,
+      fields: b.fields || null,
+      placeholder: b.placeholder || null,
+      min_length: b.min_length || null,
+      skipable: !!b.skipable
+    };
+    const { error } = await supa.from('gf_quiz_steps').upsert(row, { onConflict: 'step_key' });
+    if (error) { toast('Speichern fehlgeschlagen: ' + error.message, 'error'); return; }
+    state.dirty = false;
+    // Refresh local list
+    const idx = state.quizSteps.findIndex(s => s.step_key === row.step_key);
+    if (idx >= 0) state.quizSteps[idx] = { ...state.quizSteps[idx], ...row };
+    toast('Gespeichert', 'success');
+    renderApp();
+  }
+
+  // ====================================================================
+  // RENDER: LOGIN
+  // ====================================================================
+  function renderLogin(){
+    const showWarn = !configured;
+    root.innerHTML = `
+      <div class="login-wrap">
+        <div class="login-card">
+          <div class="login-title">GF Admin</div>
+          <div class="login-sub">Bitte einloggen.</div>
+          ${showWarn ? `
+            <div class="login-config-warning">
+              <strong>Konfiguration fehlt.</strong><br>
+              Trag deine Supabase-URL und den anon-Key in <code>config.js</code> ein und reload.
+            </div>
+          ` : `
+            <form id="loginForm">
+              <div class="login-field">
+                <label>Email</label>
+                <input type="email" id="loginEmail" required autocomplete="email" autofocus>
+              </div>
+              <div class="login-field">
+                <label>Passwort</label>
+                <input type="password" id="loginPassword" required autocomplete="current-password">
+              </div>
+              <button type="submit" class="login-btn" id="loginBtn">Einloggen</button>
+              <div id="loginErr"></div>
+            </form>
+          `}
+        </div>
+      </div>
+    `;
+    if (!showWarn) {
+      $('loginForm').addEventListener('submit', async e => {
+        e.preventDefault();
+        const btn = $('loginBtn');
+        const errBox = $('loginErr');
+        errBox.innerHTML = '';
+        btn.disabled = true;
+        btn.textContent = 'Einloggen…';
+        try {
+          await signIn($('loginEmail').value.trim(), $('loginPassword').value);
+        } catch (err) {
+          errBox.innerHTML = `<div class="login-err">${esc(err.message || 'Login fehlgeschlagen')}</div>`;
+          btn.disabled = false;
+          btn.textContent = 'Einloggen';
+        }
+      });
+    }
+  }
+
+  // ====================================================================
+  // RENDER: APP SHELL
+  // ====================================================================
+  function renderApp(){
+    const email = state.session && state.session.user && state.session.user.email || '';
+    const subCount = state.subs.length;
+    const stepCount = state.quizSteps.length;
+
+    root.innerHTML = `
+      <div class="app">
+        <div class="top">
+          <div class="top-brand">GF Admin <small>${esc(cfg.OWNER_FIRST_NAME || 'Admin')}</small></div>
+          <div class="top-right">
+            <span class="top-user">${esc(email)}</span>
+            <button class="top-btn danger" onclick="window._gfa.signOut()">Ausloggen</button>
+          </div>
+        </div>
+        <div class="tabs">
+          <button class="tab ${state.tab==='submissions'?'active':''}" onclick="window._gfa.setTab('submissions')">
+            Bewerbungen <span class="badge">${subCount}</span>
+          </button>
+          <button class="tab ${state.tab==='quiz'?'active':''}" onclick="window._gfa.setTab('quiz')">
+            Quiz <span class="badge">${stepCount}</span>
+          </button>
+        </div>
+        <div id="tabContent"></div>
+      </div>
+    `;
+    if (state.tab === 'submissions') renderSubmissions();
+    else renderQuiz();
+  }
+
+  // ====================================================================
+  // RENDER: SUBMISSIONS
+  // ====================================================================
+  function renderSubmissions(){
+    const tc = $('tabContent');
+    const q = state.subSearch.toLowerCase().trim();
+    const filtered = state.subs.filter(s => {
+      if (!q) return true;
+      return (s.name||'').toLowerCase().includes(q)
+          || (s.kontakt||'').toLowerCase().includes(q)
+          || (s.typ||'').toLowerCase().includes(q);
+    });
+
+    const withVoice = state.subs.filter(s => s.message_url).length;
+    const withText = state.subs.filter(s => s.message_text).length;
+    const today = state.subs.filter(s => {
+      const d = new Date(s.created_at);
+      const n = new Date();
+      return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate();
+    }).length;
+
+    tc.innerHTML = `
+      <div class="stats-row">
+        <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${state.subs.length}</div></div>
+        <div class="stat"><div class="stat-label">Heute</div><div class="stat-value">${today}</div></div>
+        <div class="stat"><div class="stat-label">Mit Voice/Video</div><div class="stat-value">${withVoice}</div></div>
+        <div class="stat"><div class="stat-label">Mit Text-Msg</div><div class="stat-value">${withText}</div></div>
+      </div>
+      <div class="toolbar">
+        <input type="text" class="search" id="subSearch" placeholder="Name, Kontakt oder Typ suchen…" value="${esc(state.subSearch)}">
+        <button class="btn secondary" onclick="window._gfa.refreshSubs()">↻ Aktualisieren</button>
+      </div>
+      ${filtered.length === 0 ? `
+        <div class="card">
+          <div class="empty">
+            <div class="icon">📭</div>
+            ${state.subs.length === 0 ? 'Noch keine Bewerbungen.' : 'Keine Treffer für „' + esc(state.subSearch) + '".'}
+          </div>
+        </div>
+      ` : `
+        <div class="sub-list">
+          ${filtered.map(renderSubRow).join('')}
+        </div>
+      `}
+    `;
+    const ss = $('subSearch');
+    if (ss) ss.addEventListener('input', e => {
+      state.subSearch = e.target.value;
+      renderSubmissions();
+    });
+  }
+
+  function renderSubRow(s){
+    const open = state.openSubId === s.id;
+    const msgIcon = s.message_url ? (s.message_type === 'video' ? '📹' : '🎤') : (s.message_text ? '✍️' : '');
+    return `
+      <div class="sub-row ${open?'open':''}">
+        <div class="sub-head" onclick="window._gfa.toggleSub('${s.id}')">
+          <div class="sub-col col-date">${esc(fmtDateShort(s.created_at))}</div>
+          <div class="sub-col col-name">${esc(s.name || '—')}</div>
+          <div class="sub-col col-kontakt">${esc(s.kontakt || '—')}</div>
+          <div class="sub-col col-typ">${esc(s.typ || '—')}</div>
+          <div class="sub-col col-msg">${msgIcon}</div>
+          <div class="sub-col col-toggle">▾</div>
+        </div>
+        ${open ? renderSubDetail(s) : ''}
+      </div>
+    `;
+  }
+
+  function renderSubDetail(s){
+    const field = (label, value, opts) => {
+      opts = opts || {};
+      const empty = value == null || value === '';
+      const v = empty ? '—' : value;
+      return `
+        <div class="sub-field">
+          <div class="sub-field-label">${esc(label)}</div>
+          <div class="sub-field-value ${empty?'muted':''}">${opts.raw ? v : esc(v)}</div>
+        </div>
+      `;
+    };
+    const tags = (arr) => {
+      if (!arr || !arr.length) return '<span class="sub-field-value muted">—</span>';
+      return '<div class="tag-row">' + arr.map(a => `<span class="tag">${esc(a)}</span>`).join('') + '</div>';
+    };
+
+    let messageBlock = '';
+    if (s.message_url) {
+      const isVideo = s.message_type === 'video' || /\.mp4|\.webm.*video/i.test(s.message_url);
+      messageBlock = `
+        <div class="sub-message-block">
+          <div class="sub-field-label" style="margin-bottom:0.5rem">${isVideo ? 'Video' : 'Voice'}-Nachricht</div>
+          ${isVideo
+            ? `<video src="${esc(s.message_url)}" controls playsinline></video>`
+            : `<audio src="${esc(s.message_url)}" controls preload="metadata"></audio>`}
+          <div class="sub-message-meta">
+            <span>${s.message_duration_sec ? esc(fmtDuration(s.message_duration_sec)) : ''}</span>
+            <a href="${esc(s.message_url)}" download target="_blank" rel="noopener">Download</a>
+          </div>
+        </div>
+      `;
+    } else if (s.message_text) {
+      messageBlock = `
+        <div class="sub-message-block">
+          <div class="sub-field-label" style="margin-bottom:0.5rem">Text-Nachricht</div>
+          <div class="sub-field-value">${esc(s.message_text)}</div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="sub-detail">
+        ${messageBlock}
+        <div class="sub-grid">
+          ${field('Eingegangen', fmtDate(s.created_at))}
+          ${field('Typ', s.typ)}
+          ${field('Sonntag, 11 Uhr', s.sonntag)}
+          ${field('Love Language', s.love_lang)}
+          ${field('Happy', s.happy)}
+          ${field('Happy (Freitext)', s.happy_text)}
+          ${field('Date-Wahl', s.date_wahl)}
+          ${field('Date (Freitext)', s.date_text)}
+          ${field('Kommunikation', s.comms)}
+        </div>
+        <div class="sub-grid">
+          <div class="sub-field" style="grid-column: 1 / -1;">
+            <div class="sub-field-label">Adjektive</div>
+            ${tags(s.adjektive)}
+          </div>
+          ${field('Lieblingswort', s.rapid_lieblingswort)}
+          ${field('Ohrwurm', s.rapid_ohrwurm)}
+          ${field('Always with me', s.rapid_bag)}
+        </div>
+        <div class="sub-grid" style="grid-template-columns: 1fr;">
+          ${field('Green Flags', s.greenflags)}
+          ${field('Echtes Interesse', s.interesse)}
+          ${field('Frage ans Universum', s.universe)}
+          ${field('Rückfrage an mich', s.rueckfrage)}
+        </div>
+        <div class="sub-grid">
+          ${field('User-Agent', s.user_agent)}
+          ${field('Referrer', s.referrer_url)}
+        </div>
+        <div class="sub-actions">
+          <button class="btn danger" onclick="window._gfa.deleteSub('${s.id}')">Löschen</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ====================================================================
+  // RENDER: QUIZ EDITOR
+  // ====================================================================
+  function renderQuiz(){
+    const tc = $('tabContent');
+
+    if (state.quizSteps.length === 0) {
+      tc.innerHTML = `
+        <div class="card">
+          <div class="empty">
+            <div class="icon">📋</div>
+            <p style="margin-bottom:1rem">Quiz-Tabelle ist noch leer.</p>
+            <p style="margin-bottom:1.5rem; font-size:0.85rem;">Lade die ${defaults.STEPS.length} Standard-Schritte aus dem Code in die Datenbank.</p>
+            <button class="btn" onclick="window._gfa.syncQuizDefaults()">Defaults synchronisieren</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const sel = state.editBuffer || state.quizSteps.find(s => s.step_key === state.selectedStepKey) || state.quizSteps[0];
+
+    tc.innerHTML = `
+      <div class="quiz-layout">
+        <div class="quiz-sidebar">
+          ${state.quizSteps.map(s => {
+            const isActive = s.step_key === state.selectedStepKey;
+            const q = (s.question && (s.question.de || s.question.en)) || '(ohne Frage)';
+            return `
+              <button class="quiz-side-item ${isActive?'active':''}" onclick="window._gfa.selectStep('${s.step_key}')">
+                <div class="qsi-label">${esc(s.step_key)}<span class="qsi-badge">${esc(s.step_type)}</span></div>
+                <div class="qsi-q">${esc(q)}</div>
+              </button>
+            `;
+          }).join('')}
+          <div style="padding:0.5rem; margin-top:0.5rem; border-top:1px solid var(--line)">
+            <button class="qe-add" onclick="window._gfa.syncQuizDefaults()">↻ Defaults erneut laden</button>
+          </div>
+        </div>
+        <div class="quiz-editor" id="quizEditor">
+          ${renderStepEditor(sel)}
+        </div>
+      </div>
+    `;
+    wireEditor();
+  }
+
+  function renderStepEditor(s){
+    if (!s) return '<div class="empty">Wähle einen Schritt links aus.</div>';
+
+    const text = (val, lang) => esc((val && val[lang]) || '');
+
+    return `
+      <h2>${esc(s.step_key)}</h2>
+      <div class="quiz-editor-meta">Typ: <strong>${esc(s.step_type)}</strong> · Position: ${s.sort_order}</div>
+
+      <div class="qe-section">
+        <h3>Frage</h3>
+        <div class="qe-row">
+          <div class="qe-field">
+            <label>Deutsch</label>
+            <textarea data-path="question.de">${text(s.question, 'de')}</textarea>
+          </div>
+          <div class="qe-field">
+            <label>English</label>
+            <textarea data-path="question.en">${text(s.question, 'en')}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="qe-section">
+        <h3>Untertitel</h3>
+        <div class="qe-row">
+          <div class="qe-field">
+            <label>Deutsch</label>
+            <textarea data-path="subtitle.de">${text(s.subtitle, 'de')}</textarea>
+          </div>
+          <div class="qe-field">
+            <label>English</label>
+            <textarea data-path="subtitle.en">${text(s.subtitle, 'en')}</textarea>
+          </div>
+        </div>
+      </div>
+
+      ${renderTypeSpecific(s)}
+
+      <div class="qe-bar">
+        ${(s.step_type === 'text' || s.step_type === 'message' || s.step_type === 'rueckfrage') ? `
+          <label class="qe-checkbox">
+            <input type="checkbox" data-path="skipable" ${s.skipable ? 'checked':''}>
+            Überspringbar
+          </label>
+        ` : ''}
+        <span class="qe-bar-spacer"></span>
+        <span class="qe-status ${state.dirty?'dirty':'hidden'}">${state.dirty?'Ungespeicherte Änderungen':''}</span>
+        <button class="btn secondary" onclick="window._gfa.resetStep()">Zurücksetzen</button>
+        <button class="btn" onclick="window._gfa.saveStep()" ${state.dirty?'':'disabled'}>Speichern</button>
+      </div>
+    `;
+  }
+
+  function renderTypeSpecific(s){
+    if (s.step_type === 'single') return renderOptionsEditor(s);
+    if (s.step_type === 'chips') return renderChipsEditor(s);
+    if (s.step_type === 'rapid') return renderFieldsEditor(s);
+    if (s.step_type === 'text') return renderTextEditor(s);
+    return '';
+  }
+
+  function renderOptionsEditor(s){
+    const opts = (s.options && Array.isArray(s.options)) ? s.options : [];
+    return `
+      <div class="qe-section">
+        <h3>Antwortmöglichkeiten (${opts.length})</h3>
+        ${opts.map((opt, i) => `
+          <div class="qe-option">
+            <div class="qe-option-head">
+              <span class="qe-option-num">#${i+1}</span>
+              <div class="qe-option-controls">
+                <button class="qe-icon-btn" onclick="window._gfa.moveOption(${i},-1)" ${i===0?'disabled':''} title="Nach oben">↑</button>
+                <button class="qe-icon-btn" onclick="window._gfa.moveOption(${i},1)" ${i===opts.length-1?'disabled':''} title="Nach unten">↓</button>
+                <button class="qe-icon-btn del" onclick="window._gfa.removeOption(${i})" title="Löschen">✕</button>
+              </div>
+            </div>
+            <div class="qe-row">
+              <div class="qe-field">
+                <label>Label DE</label>
+                <input data-path="options.${i}.label.de" value="${esc((opt.label && opt.label.de) || '')}">
+              </div>
+              <div class="qe-field">
+                <label>Label EN</label>
+                <input data-path="options.${i}.label.en" value="${esc((opt.label && opt.label.en) || '')}">
+              </div>
+            </div>
+            <div class="qe-row">
+              <div class="qe-field">
+                <label>Sub DE</label>
+                <input data-path="options.${i}.sub.de" value="${esc((opt.sub && opt.sub.de) || '')}">
+              </div>
+              <div class="qe-field">
+                <label>Sub EN</label>
+                <input data-path="options.${i}.sub.en" value="${esc((opt.sub && opt.sub.en) || '')}">
+              </div>
+            </div>
+            <div class="qe-row">
+              <div class="qe-field">
+                <label>Value (DB)</label>
+                <input data-path="options.${i}.value" value="${esc(opt.value || '')}">
+              </div>
+              <div class="qe-field" style="justify-content:center;">
+                <label>Freitext erlauben</label>
+                <label class="qe-checkbox" style="margin-top:0.7rem;">
+                  <input type="checkbox" data-path="options.${i}.allowText" ${opt.allowText?'checked':''}>
+                  Zusätzliches Textfeld
+                </label>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+        <button class="qe-add" onclick="window._gfa.addOption()">+ Antwort hinzufügen</button>
+      </div>
+    `;
+  }
+
+  function renderChipsEditor(s){
+    const opts = (s.options && Array.isArray(s.options)) ? s.options : [];
+    return `
+      <div class="qe-section">
+        <h3>Chip-Optionen (${opts.length}) — z.B. Adjektive</h3>
+        ${opts.map((opt, i) => `
+          <div class="qe-option" style="padding:0.6rem;">
+            <div class="qe-option-head">
+              <span class="qe-option-num">#${i+1}</span>
+              <div class="qe-option-controls">
+                <button class="qe-icon-btn" onclick="window._gfa.moveOption(${i},-1)" ${i===0?'disabled':''}>↑</button>
+                <button class="qe-icon-btn" onclick="window._gfa.moveOption(${i},1)" ${i===opts.length-1?'disabled':''}>↓</button>
+                <button class="qe-icon-btn del" onclick="window._gfa.removeOption(${i})">✕</button>
+              </div>
+            </div>
+            <div class="qe-row">
+              <div class="qe-field"><label>DE</label><input data-path="options.${i}.de" value="${esc(opt.de || '')}"></div>
+              <div class="qe-field"><label>EN</label><input data-path="options.${i}.en" value="${esc(opt.en || '')}"></div>
+            </div>
+          </div>
+        `).join('')}
+        <button class="qe-add" onclick="window._gfa.addOption()">+ Chip hinzufügen</button>
+      </div>
+    `;
+  }
+
+  function renderFieldsEditor(s){
+    const fields = (s.fields && Array.isArray(s.fields)) ? s.fields : [];
+    return `
+      <div class="qe-section">
+        <h3>Schnellrunden-Felder (${fields.length})</h3>
+        ${fields.map((f, i) => `
+          <div class="qe-option">
+            <div class="qe-option-head">
+              <span class="qe-option-num">#${i+1}</span>
+              <div class="qe-option-controls">
+                <button class="qe-icon-btn" onclick="window._gfa.moveField(${i},-1)" ${i===0?'disabled':''}>↑</button>
+                <button class="qe-icon-btn" onclick="window._gfa.moveField(${i},1)" ${i===fields.length-1?'disabled':''}>↓</button>
+                <button class="qe-icon-btn del" onclick="window._gfa.removeField(${i})">✕</button>
+              </div>
+            </div>
+            <div class="qe-row">
+              <div class="qe-field"><label>Key (DB)</label><input data-path="fields.${i}.key" value="${esc(f.key || '')}"></div>
+              <div class="qe-field"><label>Label DE</label><input data-path="fields.${i}.label.de" value="${esc((f.label&&f.label.de)||'')}"></div>
+            </div>
+            <div class="qe-row">
+              <div class="qe-field"><label>Label EN</label><input data-path="fields.${i}.label.en" value="${esc((f.label&&f.label.en)||'')}"></div>
+              <div class="qe-field"><label>Placeholder DE</label><input data-path="fields.${i}.placeholder.de" value="${esc((f.placeholder&&f.placeholder.de)||'')}"></div>
+            </div>
+            <div class="qe-row">
+              <div class="qe-field"><label>Placeholder EN</label><input data-path="fields.${i}.placeholder.en" value="${esc((f.placeholder&&f.placeholder.en)||'')}"></div>
+              <div></div>
+            </div>
+          </div>
+        `).join('')}
+        <button class="qe-add" onclick="window._gfa.addField()">+ Feld hinzufügen</button>
+      </div>
+    `;
+  }
+
+  function renderTextEditor(s){
+    return `
+      <div class="qe-section">
+        <h3>Placeholder & Validierung</h3>
+        <div class="qe-row">
+          <div class="qe-field">
+            <label>Placeholder DE</label>
+            <textarea data-path="placeholder.de">${esc((s.placeholder&&s.placeholder.de)||'')}</textarea>
+          </div>
+          <div class="qe-field">
+            <label>Placeholder EN</label>
+            <textarea data-path="placeholder.en">${esc((s.placeholder&&s.placeholder.en)||'')}</textarea>
+          </div>
+        </div>
+        <div class="qe-row">
+          <div class="qe-field">
+            <label>Mindestlänge (Zeichen)</label>
+            <input type="number" data-path="min_length" value="${s.min_length || 0}" min="0">
+          </div>
+          <div></div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ====================================================================
+  // EDITOR WIRING
+  // ====================================================================
+  function setByPath(obj, path, value){
+    const parts = path.split('.');
+    let cur = obj;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const p = parts[i];
+      const nextIsArr = /^\d+$/.test(parts[i+1]);
+      if (cur[p] == null) cur[p] = nextIsArr ? [] : {};
+      cur = cur[p];
+    }
+    cur[parts[parts.length-1]] = value;
+  }
+
+  function wireEditor(){
+    const ed = $('quizEditor');
+    if (!ed) return;
+    ed.querySelectorAll('[data-path]').forEach(inp => {
+      const path = inp.getAttribute('data-path');
+      const handler = () => {
+        let v;
+        if (inp.type === 'checkbox') v = inp.checked;
+        else if (inp.type === 'number') v = inp.value === '' ? null : parseInt(inp.value, 10);
+        else v = inp.value;
+        setByPath(state.editBuffer, path, v);
+        state.dirty = true;
+        // Update only the status + save button (no full re-render to keep focus)
+        const status = ed.querySelector('.qe-status');
+        if (status) { status.classList.remove('hidden'); status.classList.add('dirty'); status.textContent = 'Ungespeicherte Änderungen'; }
+        const saveBtn = ed.querySelector('.qe-bar .btn:not(.secondary)');
+        if (saveBtn) saveBtn.removeAttribute('disabled');
+      };
+      inp.addEventListener('input', handler);
+      inp.addEventListener('change', handler);
+    });
+  }
+
+  // ====================================================================
+  // PUBLIC ACTIONS
+  // ====================================================================
+  window._gfa = {
+    setTab(t){ state.tab = t; renderApp(); },
+    refreshSubs: async () => { state.loading = true; await fetchSubmissions(); renderApp(); },
+    toggleSub(id){ state.openSubId = state.openSubId === id ? null : id; renderSubmissions(); },
+    deleteSub: id => deleteSubmission(id),
+    signOut: async () => { await signOut(); },
+    syncQuizDefaults: () => syncQuizDefaults(),
+    selectStep(key){
+      if (state.dirty && !confirm('Du hast ungespeicherte Änderungen. Wirklich wechseln?')) return;
+      state.selectedStepKey = key;
+      const s = state.quizSteps.find(x => x.step_key === key);
+      state.editBuffer = s ? deepClone(s) : null;
+      state.dirty = false;
+      renderQuiz();
+    },
+    saveStep: () => saveQuizStep(),
+    resetStep(){
+      const s = state.quizSteps.find(x => x.step_key === state.selectedStepKey);
+      state.editBuffer = s ? deepClone(s) : null;
+      state.dirty = false;
+      renderQuiz();
+    },
+    addOption(){
+      if (!state.editBuffer) return;
+      if (!Array.isArray(state.editBuffer.options)) state.editBuffer.options = [];
+      if (state.editBuffer.step_type === 'chips') {
+        state.editBuffer.options.push({ de:'', en:'' });
+      } else {
+        state.editBuffer.options.push({ label:{de:'',en:''}, sub:{de:'',en:''}, value:'' });
+      }
+      state.dirty = true;
+      renderQuiz();
+    },
+    removeOption(i){
+      if (!state.editBuffer || !state.editBuffer.options) return;
+      state.editBuffer.options.splice(i,1);
+      state.dirty = true;
+      renderQuiz();
+    },
+    moveOption(i, dir){
+      if (!state.editBuffer || !state.editBuffer.options) return;
+      const arr = state.editBuffer.options;
+      const j = i + dir;
+      if (j < 0 || j >= arr.length) return;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      state.dirty = true;
+      renderQuiz();
+    },
+    addField(){
+      if (!state.editBuffer) return;
+      if (!Array.isArray(state.editBuffer.fields)) state.editBuffer.fields = [];
+      state.editBuffer.fields.push({ key:'', label:{de:'',en:''}, placeholder:{de:'',en:''} });
+      state.dirty = true;
+      renderQuiz();
+    },
+    removeField(i){
+      if (!state.editBuffer || !state.editBuffer.fields) return;
+      state.editBuffer.fields.splice(i,1);
+      state.dirty = true;
+      renderQuiz();
+    },
+    moveField(i, dir){
+      if (!state.editBuffer || !state.editBuffer.fields) return;
+      const arr = state.editBuffer.fields;
+      const j = i + dir;
+      if (j < 0 || j >= arr.length) return;
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      state.dirty = true;
+      renderQuiz();
+    }
+  };
+
+  // ====================================================================
+  // BOOT
+  // ====================================================================
+  initAuth();
+})();
+</script>
+
+</body></html>
