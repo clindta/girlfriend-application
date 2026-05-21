@@ -5,7 +5,7 @@
 // ====================================================================
 
 window.GF_DEFAULTS = (function(){
-  const STEPS = ['typ','adjektive','sonntag','schnellrunde','greenflags','interesse','love_lang','happy','date','comms','universe','rueckfrage','message','kontakt'];
+  const STEPS = ['typ','adjektive','sonntag','greenflags','interesse','love_lang','happy','date','comms','universe','rueckfrage','message','kontakt'];
 
   const ADJEKTIVE = [
     { de:'aufgeschlossen',   en:'open-minded' },
@@ -34,9 +34,7 @@ window.GF_DEFAULTS = (function(){
       subtitle: { de:'Ehrlich. Erspart uns beiden Zeit.', en:'Be honest. Saves us both time.' },
       options: [
         { label:{ de:'Eine Beziehung',                en:'A relationship' },                value:'Beziehung' },
-        { label:{ de:'Was Loses, mal sehen wohin',    en:"Something casual, let's see" },   value:'Situationship' },
-        { label:{ de:'Spaß, kein Stress',             en:'Fun, no stress' },                value:'FWB' },
-        { label:{ de:'Eine neue Freundschaft',        en:'A new friendship' },              value:'Freundschaft' },
+        { label:{ de:'Was lockeres, mal sehen wohin', en:"Something casual, let's see" },   value:'Situationship' },
         { label:{ de:'Keine Ahnung, bin offen',       en:'No clue, just open' },            value:'Unklar' }
       ]
     },
@@ -51,21 +49,12 @@ window.GF_DEFAULTS = (function(){
       question: { de:'Sonntag, 11 Uhr.\nWas machst du?', en:'Sunday, 11 AM.\nWhat are you doing?' },
       subtitle: { de:'Verrät tatsächlich am meisten. Wirklich.', en:'Honestly tells me the most. Really.' },
       options: [
-        { label:{ de:'Brunch mit zu vielen Carbs',                         en:'Brunch with too many carbs' },                          value:'Brunch' },
-        { label:{ de:'Noch im Bett, scrolle TikTok',                       en:'Still in bed, scrolling TikTok' },                      value:'Bett' },
-        { label:{ de:'Wandern, Coldplunge. Ich bin diszipliniert.',        en:'Hiking, coldplunge. I am disciplined.' },               value:'Diszipliniert' },
-        { label:{ de:'Im Café, Buch, leise melancholisch aus dem Fenster', en:'In a café, book, quietly melancholic out the window' }, value:'Cafe' },
-        { label:{ de:'Mit Freundinnen alles vom Wochenende durchgehen',    en:'With friends, processing the whole weekend' },          value:'Freundinnen' }
-      ]
-    },
-    schnellrunde: {
-      type: 'rapid',
-      question: { de:'Schnellrunde.', en:'Quick round.' },
-      subtitle: { de:'Drei kurze. Erstes was dir einfällt.', en:'Three quick ones. First thing that comes to mind.' },
-      fields: [
-        { key:'lieblingswort', label:{ de:'Dein Lieblingswort',      en:'Your favorite word' },         placeholder:{ de:'z.B. „eh"',                en:"e.g. 'vibe'" } },
-        { key:'ohrwurm',       label:{ de:'Dein letzter Ohrwurm',     en:'Your last earworm' },          placeholder:{ de:'Song + Artist reicht',     en:'Song + artist is enough' } },
-        { key:'bag',           label:{ de:'Das hast du immer dabei',  en:"What you always have on you" }, placeholder:{ de:'Kopfhörer, Lipbalm, ein Buch…', en:'Headphones, lip balm, a book…' } }
+        { label:{ de:'Früh raus, eine Runde Laufen oder Pilates.',     en:'Get up early, go for a run or do some Pilates.' },         value:'Diszipliniert' },
+        { label:{ de:'Lange ausschlagen, dann lesen oder lernen',      en:'Still in bed, scrolling TikTok' },                          value:'Bett' },
+        { label:{ de:'Brunch mit zu vielen Carbs',                     en:'Brunch with too many carbs' },                              value:'Brunch' },
+        { label:{ de:'Mit Freundinnen alles vom Wochenende durchgehen', en:'With friends, processing the whole weekend' },             value:'Freundinnen' },
+        { label:{ de:'ich gehe arbeiten. Von nichts kommt nichts.',    en:"I'm going to work. You can't get something for nothing." }, value:'Cafe' },
+        { label:{ de:'Raus aus der Staft. Wandern, See, frische Luft', en:'' },                                                        value:'' }
       ]
     },
     greenflags: {
